@@ -103,8 +103,19 @@ export default function Profile() {
       const data = await res.json();
       if (!res.ok) return dispatch(signInFailure(data.message));
       dispatch(signInSuccess(null));
+    } catch (error) {
+      dispatch(signInFailure(error.message));
+    }
+  };
 
-
+  const handleSignout = async () => {
+    try {
+      const res = await fetch("/api/user/signout", {
+        method: "GET",
+      });
+      const data = await res.json();
+      if (!res.ok) return dispatch(signInFailure(data.message));
+      dispatch(signInSuccess(null));
     } catch (error) {
       dispatch(signInFailure(error.message));
     }
@@ -164,7 +175,7 @@ export default function Profile() {
         <span className="text-red-700 cursor-pointer" onClick={handleDelete}>
           Delete Account
         </span>
-        <span className="text-red-700 cursor-pointer">Sign out</span>
+        <span className="text-red-700 cursor-pointer" onClick={handleSignout}>Sign out</span>
       </div>
       {error && <p className=" text-red-500 mt-5">{error}</p>}
     </div>
