@@ -6,7 +6,11 @@ import {
   ref,
   uploadBytesResumable,
 } from "firebase/storage";
-import { signInFailure, signInStart, signInSuccess } from "../redux/slice/userSlice";
+import {
+  signInFailure,
+  signInStart,
+  signInSuccess,
+} from "../redux/slice/userSlice";
 
 export default function Profile() {
   const fileRef = useRef(null);
@@ -43,7 +47,7 @@ export default function Profile() {
     uploadTask.on(
       "state_changed",
       (snapShot) => {
-        dispatch(signInFailure(null))
+        dispatch(signInFailure(null));
         const progress =
           (snapShot.bytesTransferred / snapShot.totalBytes) * 100;
         console.log(`Upload is ${progress}% done`);
@@ -57,7 +61,7 @@ export default function Profile() {
         getDownloadURL(uploadTask.snapshot.ref).then((downloadURL) => {
           setImageURL(downloadURL);
           setFormData({ ...formData, avatar: downloadURL });
-          dispatch(signInFailure(null))
+          dispatch(signInFailure(null));
         });
       }
     );
@@ -81,7 +85,7 @@ export default function Profile() {
       if (!res.ok) {
         return dispatch(signInFailure(data.message));
       }
-      dispatch(signInSuccess(data))
+      dispatch(signInSuccess(data));
     } catch (error) {
       dispatch(signInFailure(error.message));
     }
@@ -89,6 +93,21 @@ export default function Profile() {
   const handleChange = (e) => {
     dispatch(signInFailure(null));
     setFormData({ ...formData, [e.target.id]: e.target.value });
+  };
+
+  const handleDelete = async () => {
+    try {
+      const res = await fetch(`/api/user/delete/${currentUser._id}`, {
+        method: "DELETE",
+      });
+      const data = await res.json();
+      if (!res.ok) return dispatch(signInFailure(data.message));
+      dispatch(signInSuccess(null));
+
+
+    } catch (error) {
+      dispatch(signInFailure(error.message));
+    }
   };
 
   return (
@@ -134,14 +153,17 @@ export default function Profile() {
           className=" border p-3  rounded-lg"
           onChange={handleChange}
         />
-        <button className=" bg-slate-700 text-white rounded-lg p-3 uppercase hover:opacity-95 disabled:opacity-80"
-        disabled={loading}
+        <button
+          className=" bg-slate-700 text-white rounded-lg p-3 uppercase hover:opacity-95 disabled:opacity-80"
+          disabled={loading}
         >
           update
         </button>
       </form>
       <div className=" flex flex-row justify-between mt-5">
-        <span className="text-red-700 cursor-pointer">Delete Account</span>
+        <span className="text-red-700 cursor-pointer" onClick={handleDelete}>
+          Delete Account
+        </span>
         <span className="text-red-700 cursor-pointer">Sign out</span>
       </div>
       {error && <p className=" text-red-500 mt-5">{error}</p>}

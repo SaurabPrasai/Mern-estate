@@ -24,7 +24,7 @@ export const signin = async (req, res, next) => {
     if (!validPassword) return next(errorHandler(401, "Wrong credentials"));
     const { password: pass, ...rest } = validUser._doc;
     const token = jwt.sign({ id: validUser._id }, process.env.JWT_SECRET, {
-      expiresIn: "3d",
+      expiresIn: "7d",
     });
     res
       .cookie("access_token", token, { httpOnly: true })
@@ -40,7 +40,7 @@ export const google = async (req, res, next) => {
     const user = await User.findOne({ email: req.body.email });
     if (user) {
       const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET, {
-        expiresIn: "3d",
+        expiresIn: "7d",
       });
       const { password: pass, ...rest } = user._doc;
       res
@@ -62,7 +62,7 @@ export const google = async (req, res, next) => {
       newUser.save();
 
       const token = jwt.sign({ id: newUser._id }, process.env.JWT_SECRET, {
-        expiresIn: "3d",
+        expiresIn: "7d",
       });
       const { password: pass, ...rest } = newUser._doc;
       res

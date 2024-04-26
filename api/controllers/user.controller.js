@@ -36,8 +36,33 @@ export const updateUser = async (req, res, next) => {
         new: true,
       }
     );
-    const {password,...other}=user._doc
-     return res.status(200).json(other)
+    const { password, ...other } = user._doc;
+    return res.status(200).json(other);
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const deleteUser = async (req, res, next) => {
+  if (req.params.id != req.user.id)
+    return next(errorHandler(403, "You are not allowerd to delete this user"));
+  try {
+    await User.findByIdAndDelete(req.params.id);
+    return res
+      .clearCookie("access_token")
+      .status(200)
+      .json("User has been deleted");
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const signout = (req, res) => {
+  try {
+    return res
+      .clearCookie("access_token")
+      .status(200)
+      .json("User has been signed out");
   } catch (error) {
     next(error);
   }
